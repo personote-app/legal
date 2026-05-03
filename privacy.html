@@ -139,7 +139,7 @@
 
   <!-- Chinese -->
   <section data-lang="zh">
-    <p class="meta">最後更新：2026 年 4 月 27 日</p>
+    <p class="meta">最後更新：2026 年 5 月 3 日</p>
 
     <p>Personote 是我們團隊每天也在用的 app。做這個產品，是希望腦袋有個地方可以放下來——所以我們不會讓它變成另一個讓你擔心資料的地方。</p>
     <p>以下說明我們是誰、能看到什麼、拿不到什麼、為什麼要看，以及你擁有的權利。</p>
@@ -154,8 +154,16 @@
     <p>蘋果會提供我們一組 Apple User ID（不是你的信箱）、你的名字（可選）、email（可選，也可以使用「隱藏我的電子郵件」中繼信箱）。</p>
     <div class="callout">Apple User ID 雖然不是你的真名，但能持續識別出「同一個你」，因此在 GDPR 下屬於<strong>假名化（pseudonymous）資料</strong>，不是匿名資料——我們仍然把它當作個人資料來保護。</div>
 
+    <h3>登入時（Google 登入）</h3>
+    <p>使用 Google 登入時，Google 會提供你的 Google 帳號 email 與顯示名稱，用於建立與識別你的帳號。這些資訊會透過 Firebase Authentication 存放，做為你帳號的一部分。</p>
+
     <h3>你寫的便利貼、打卡紀錄</h3>
-    <p>全部存放在你的手機與個人 iCloud（透過 Apple CloudKit 私人資料庫）。我們看不到你寫了什麼；即使想看也拿不到，因為 Apple 的私人資料庫連我們都沒有讀取權限。這也代表：如果你刪除自己的 iCloud 內容，我們無法恢復。</p>
+    <p>你的便利貼內容（卡片標題、步驟、打卡紀錄等）會存放在兩個地方：</p>
+    <ul>
+      <li><strong>本機（手機端）</strong>：透過 SwiftData 在你的裝置上本地儲存，不經過任何伺服器。</li>
+      <li><strong>雲端（Firebase Firestore）</strong>：為了讓你能跨裝置同步，資料也會上傳到 Firebase Firestore（Google Cloud 美國伺服器）。</li>
+    </ul>
+    <div class="callout">與我們先前使用的 Apple CloudKit 不同，Firebase Firestore 讓我們在技術上具有讀取資料庫內容的能力。我們的承諾是：<strong>不會</strong>讀取、存取或分析你的便利貼文字，除非你主動聯繫客服並需要我們協助還原資料。我們設有 Firestore Security Rules，確保每位用戶只能讀寫自己的資料。</div>
 
     <h3>使用數據（透過 Mixpanel）</h3>
     <p>為了解哪些功能有人使用、哪裡的體驗卡住，我們透過 Mixpanel 紀錄不含內容的事件：</p>
@@ -167,14 +175,15 @@
       <li>切換畫面、切換週/月/年圖表</li>
       <li>觸發 6 張卡上限、刪除帳號等關鍵行為</li>
     </ul>
-    <p>這些事件會與你的 Apple User ID 關聯，但不包含任何便利貼文字、姓名、email、照片、地理位置、IDFA、裝置指紋。</p>
+    <p>這些事件會與你的帳號識別碼（SHA-256 雜湊處理，無法逆推至原始 ID）關聯，不包含任何便利貼文字、姓名、email、照片、地理位置、IDFA、裝置指紋。</p>
 
     <h2>為什麼要看（法律基礎）</h2>
     <table>
       <thead><tr><th>資料</th><th>目的</th><th>法律基礎（GDPR Art. 6）</th></tr></thead>
       <tbody>
         <tr><td>Apple User ID、名字、email</td><td>提供登入與帳號功能</td><td>履行契約（6(1)(b)）</td></tr>
-        <tr><td>iCloud 上的便利貼內容</td><td>同步你自己的資料；我們無法讀取</td><td>履行契約（6(1)(b)）</td></tr>
+        <tr><td>Google email、顯示名稱</td><td>提供 Google 登入與帳號功能</td><td>履行契約（6(1)(b)）</td></tr>
+        <tr><td>Firestore 上的便利貼內容</td><td>提供跨裝置同步功能；我們不讀取其內容</td><td>履行契約（6(1)(b)）</td></tr>
         <tr><td>Mixpanel 假名化使用事件</td><td>改善產品、找出體驗瓶頸</td><td>合法利益（6(1)(f)）——你可隨時反對</td></tr>
       </tbody>
     </table>
@@ -185,7 +194,7 @@
       <li>不販售你的資料（CCPA / CPRA 下我們也不「分享（share）」資料給第三方做跨網站廣告）</li>
       <li>不做廣告追蹤；不請求 ATT（App Tracking Transparency）權限</li>
       <li>不蒐集 IDFA、裝置指紋、精確地理位置</li>
-      <li>不讀取你的便利貼內容（做不到）</li>
+      <li>不讀取你的便利貼文字內容（雖然技術上有能力，但我們的政策是不這樣做，且 Firestore Security Rules 限制了非授權的存取）</li>
       <li>不與其他 app 交換任何資料</li>
       <li>不對未成年人投放任何處理</li>
     </ul>
@@ -195,8 +204,8 @@
     <ul>
       <li><strong>查看 / 取得（access, portability）</strong>：所有資料 app 內皆可查看；想要結構化匯出檔，寄信給我們。</li>
       <li><strong>更正（rectification）</strong>：在 app 內直接編輯；登入相關欄位請寄信。</li>
-      <li><strong>刪除（erasure / right to delete）</strong>：齒輪 → 刪除帳號，一次清除本機與 iCloud 資料；同時我們會在 30 天內刪除你在 Mixpanel 中的事件。</li>
-      <li><strong>反對 / 退出分析（objection / opt-out）</strong>：寄信到 <code>personote.app@gmail.com</code> 主旨「Opt out of analytics」並附上你的 Apple ID 中繼信箱，我們會在 7 天內處理（in-app 開關功能將於 v2 加入）。</li>
+      <li><strong>刪除（erasure / right to delete）</strong>：齒輪 → 刪除帳號，一次清除本機資料與 Firestore 雲端資料；同時我們會在 30 天內刪除你在 Mixpanel 中的事件。</li>
+      <li><strong>反對 / 退出分析（objection / opt-out）</strong>：寄信到 <code>personote.app@gmail.com</code> 主旨「Opt out of analytics」並附上你的帳號 email，我們會在 7 天內處理（in-app 開關功能將於 v2 加入）。</li>
       <li><strong>拒絕「販售 / 分享」（CCPA / CPRA）</strong>：我們不販售或分享，所以你不需要做任何事——但你仍然可以發信確認狀態。</li>
       <li><strong>撤回同意</strong>：如果未來我們新增需要同意的功能，你可以隨時撤回，且不會影響撤回前的合法處理。</li>
       <li><strong>向監管機關申訴</strong>：歐盟可向你所在地 DPA 申訴；台灣可向數位發展部 / 個資保護委員會申訴；加州可聯繫 California Privacy Protection Agency。</li>
@@ -208,18 +217,23 @@
       <thead><tr><th>資料</th><th>保留期間</th></tr></thead>
       <tbody>
         <tr><td>Apple User ID、名字、email</td><td>帳號存在期間</td></tr>
-        <tr><td>iCloud 上的便利貼</td><td>由 Apple 與你的 iCloud 設定控制；刪帳號時一併清除</td></tr>
+        <tr><td>Google email、顯示名稱</td><td>帳號存在期間</td></tr>
+        <tr><td>Firestore 上的便利貼、打卡記錄</td><td>帳號存在期間；刪帳號時立即清除（由 app 端呼叫刪除 API）</td></tr>
         <tr><td>Mixpanel 假名化事件</td><td>自事件產生起 <strong>365 天</strong>自動過期；刪帳號時於 30 天內手動清除</td></tr>
         <tr><td>法律與合規日誌</td><td>為證明我們處理過你的請求，最多保留 3 年</td></tr>
       </tbody>
     </table>
 
     <h2>跨境資料傳輸</h2>
-    <p>Mixpanel 的伺服器位於美國，這代表你的假名化使用事件會從你所在地（可能是台灣 / 歐盟 / 美國 / 其他）傳輸到美國。</p>
+    <p>我們使用的以下服務伺服器位於美國，你的資料因此會從你所在地（可能是台灣 / 歐盟 / 美國 / 其他）傳輸到美國：</p>
+    <ul>
+      <li><strong>Firebase（Firestore 與 Authentication）</strong>：你的帳號與便利貼資料由 Google 的 Firebase 平台存放於美國伺服器。</li>
+      <li><strong>Mixpanel</strong>：你的假名化使用事件存放於 Mixpanel 美國伺服器。</li>
+    </ul>
     <p>針對 EU / 英國使用者，這項傳輸的法律機制是：</p>
     <ul>
-      <li>Mixpanel 已通過 <a href="https://www.dataprivacyframework.gov/">EU-U.S. Data Privacy Framework</a> 認證；以及</li>
-      <li>我們與 Mixpanel 簽訂的 Standard Contractual Clauses（SCCs）作為備援。</li>
+      <li>Firebase（Google）已通過 <a href="https://www.dataprivacyframework.gov/">EU-U.S. Data Privacy Framework</a> 認證；以及</li>
+      <li>Google 與 Mixpanel 均提供 Standard Contractual Clauses（SCCs）作為備援。</li>
     </ul>
     <p>針對台灣使用者，依據個資法第 21 條，本傳輸符合主管機關認可的國際傳輸條件。</p>
     <p>如果你不接受跨境傳輸，請寄信 opt out（見上方權利章節）。</p>
@@ -228,10 +242,11 @@
     <p>Personote 並非為 13 歲以下兒童設計，也不會主動蒐集兒童資料。如果你發現我們意外收到兒童資料，請寄信通知，我們會立即刪除。</p>
 
     <h2>我們使用的第三方服務</h2>
-    <p>只有三項：</p>
+    <p>只有四項：</p>
     <ul>
       <li><strong>Sign in with Apple</strong> — 登入；資料處理依照 <a href="https://www.apple.com/legal/privacy/">Apple Privacy Policy</a></li>
-      <li><strong>iCloud (CloudKit)</strong> — 同步你的資料；同上</li>
+      <li><strong>Google Sign-In</strong> — 登入；資料處理依照 <a href="https://policies.google.com/privacy">Google Privacy Policy</a></li>
+      <li><strong>Firebase（Authentication + Firestore）</strong> — 帳號驗證與雲端資料同步；資料存放於 Google Cloud 美國伺服器；<a href="https://firebase.google.com/support/privacy">Firebase Privacy Policy</a></li>
       <li><strong>Mixpanel</strong> — 假名化使用統計；資料存放於其美國伺服器；<a href="https://mixpanel.com/legal/privacy-policy/">Mixpanel Privacy Policy</a></li>
     </ul>
     <p>不使用 Google Analytics、Facebook SDK、廣告 SDK，也不嵌入第三方 cookie（純 native app 不適用 cookie）。</p>
@@ -255,7 +270,7 @@
 
   <!-- English -->
   <section data-lang="en">
-    <p class="meta">Last updated: April 27, 2026</p>
+    <p class="meta">Last updated: May 3, 2026</p>
 
     <p>Personote is an app our team uses every day. We built it to give your mind a quiet place to set things down — so it should never feel like another place to worry about your data.</p>
     <p>Here's who we are, what we can see, what we can't, why we look, and the rights you have.</p>
@@ -270,8 +285,16 @@
     <p>Apple hands us an Apple User ID (not your email), your name (optional), and your email (optional — Hide My Email is supported).</p>
     <div class="callout">Apple User ID isn't your real name, but it persistently identifies "the same you" — under GDPR this is <strong>pseudonymous data</strong>, not anonymous. We treat it as personal data and protect it accordingly.</div>
 
+    <h3>Sign in with Google</h3>
+    <p>When you sign in with Google, Google provides your Google account email and display name. These are stored via Firebase Authentication and used solely to identify and manage your account.</p>
+
     <h3>Your notes and check-ins</h3>
-    <p>Everything stays on your phone and in your personal iCloud (via the Apple CloudKit private database). We can't see what you write; even if we wanted to, we have no read access to Apple's private database. This also means: if you delete your iCloud data, we can't restore it.</p>
+    <p>Your note content (card titles, steps, check-in records, etc.) is stored in two places:</p>
+    <ul>
+      <li><strong>On-device</strong>: locally via SwiftData on your phone, never touching any server.</li>
+      <li><strong>Cloud (Firebase Firestore)</strong>: to enable cross-device sync, data is also uploaded to Firebase Firestore (Google Cloud, US servers).</li>
+    </ul>
+    <div class="callout">Unlike Apple CloudKit, Firebase Firestore gives us technical read access to the database. Our commitment: we will <strong>not</strong> read, access, or analyze your note text, unless you contact support and explicitly ask us to help restore data. We enforce Firestore Security Rules so each user can only read and write their own data.</div>
 
     <h3>Usage data (via Mixpanel)</h3>
     <p>To understand which features get used and where the experience trips people up, we record content-free events through Mixpanel:</p>
@@ -283,14 +306,15 @@
       <li>Screen changes and chart range switches (Week / Month / Year)</li>
       <li>Hitting the 6-card limit, account deletions, and similar key actions</li>
     </ul>
-    <p>These events associate with your Apple User ID but contain no note text, name, email, photos, location, IDFA, or device fingerprint.</p>
+    <p>These events are linked to a pseudonymous account identifier (SHA-256 hashed — cannot be reversed to the original ID). They contain no note text, name, email, photos, location, IDFA, or device fingerprint.</p>
 
     <h2>Why we look (legal basis)</h2>
     <table>
       <thead><tr><th>Data</th><th>Purpose</th><th>Legal basis (GDPR Art. 6)</th></tr></thead>
       <tbody>
         <tr><td>Apple User ID, name, email</td><td>Provide login and account features</td><td>Contract (6(1)(b))</td></tr>
-        <tr><td>Notes content in iCloud</td><td>Sync your own data; we cannot read it</td><td>Contract (6(1)(b))</td></tr>
+        <tr><td>Google email, display name</td><td>Provide Google login and account features</td><td>Contract (6(1)(b))</td></tr>
+        <tr><td>Notes content in Firestore</td><td>Enable cross-device sync; we do not read its content</td><td>Contract (6(1)(b))</td></tr>
         <tr><td>Pseudonymous Mixpanel events</td><td>Improve the product, find friction</td><td>Legitimate interests (6(1)(f)) — you can object anytime</td></tr>
       </tbody>
     </table>
@@ -301,7 +325,7 @@
       <li>We don't sell your data (and under CCPA/CPRA, we don't "share" it for cross-context advertising either)</li>
       <li>No ad tracking; we don't request the App Tracking Transparency permission</li>
       <li>No IDFA, device fingerprint, or precise location collection</li>
-      <li>We don't read your note content (we can't)</li>
+      <li>We don't read your note text (we technically could access Firestore, but our policy is never to do so, and Security Rules block unauthorized access)</li>
       <li>No data exchange with other apps</li>
       <li>No processing aimed at minors</li>
     </ul>
@@ -311,8 +335,8 @@
     <ul>
       <li><strong>Access / portability</strong>: every piece of data is visible inside the app; for a structured export, email us.</li>
       <li><strong>Rectification</strong>: edit directly in the app; for sign-in fields, email us.</li>
-      <li><strong>Erasure / right to delete</strong>: gear → Delete account wipes everything on device and in iCloud; we'll also delete your Mixpanel events within 30 days.</li>
-      <li><strong>Object / opt out of analytics</strong>: email <code>personote.app@gmail.com</code> with subject "Opt out of analytics" and your Apple Hide-My-Email relay address; we'll process within 7 days. (An in-app toggle is landing in v2.)</li>
+      <li><strong>Erasure / right to delete</strong>: gear → Delete account clears everything on-device and in Firestore; we'll also delete your Mixpanel events within 30 days.</li>
+      <li><strong>Object / opt out of analytics</strong>: email <code>personote.app@gmail.com</code> with subject "Opt out of analytics" and your account email; we'll process within 7 days. (An in-app toggle is landing in v2.)</li>
       <li><strong>Right not to have data sold or shared (CCPA / CPRA)</strong>: we don't sell or share, so there's nothing you need to do — but you can email to confirm.</li>
       <li><strong>Withdraw consent</strong>: if we ever add a feature requiring consent, you can withdraw it anytime without affecting prior lawful processing.</li>
       <li><strong>Lodge a complaint</strong>: in the EU, with your local DPA; in Taiwan, with the Ministry of Digital Affairs / PDPC; in California, with the California Privacy Protection Agency.</li>
@@ -324,18 +348,23 @@
       <thead><tr><th>Data</th><th>Retention</th></tr></thead>
       <tbody>
         <tr><td>Apple User ID, name, email</td><td>Lifetime of your account</td></tr>
-        <tr><td>Notes in iCloud</td><td>Controlled by Apple and your iCloud settings; cleared when you delete your account</td></tr>
+        <tr><td>Google email, display name</td><td>Lifetime of your account</td></tr>
+        <tr><td>Notes and check-ins in Firestore</td><td>Lifetime of your account; deleted immediately when you delete your account</td></tr>
         <tr><td>Pseudonymous Mixpanel events</td><td>Auto-expire <strong>365 days</strong> after the event; manually deleted within 30 days of account deletion</td></tr>
         <tr><td>Legal and compliance logs</td><td>Up to 3 years to demonstrate we handled your request</td></tr>
       </tbody>
     </table>
 
     <h2>International data transfers</h2>
-    <p>Mixpanel servers are in the United States. That means your pseudonymous usage events travel from where you are (Taiwan, the EU, the US, or elsewhere) to the US.</p>
-    <p>For EU/UK users, the legal mechanisms for this transfer are:</p>
+    <p>The following services we use have servers in the United States, meaning your data travels from your location (Taiwan, the EU, the US, or elsewhere) to the US:</p>
     <ul>
-      <li>Mixpanel's certification under the <a href="https://www.dataprivacyframework.gov/">EU-U.S. Data Privacy Framework</a>; and</li>
-      <li>Standard Contractual Clauses (SCCs) we've executed with Mixpanel as a backup.</li>
+      <li><strong>Firebase (Firestore and Authentication)</strong>: your account and note data are stored on Google Cloud US servers.</li>
+      <li><strong>Mixpanel</strong>: your pseudonymous usage events are stored on Mixpanel US servers.</li>
+    </ul>
+    <p>For EU/UK users, the legal mechanisms for these transfers are:</p>
+    <ul>
+      <li>Firebase (Google) and Mixpanel are certified under the <a href="https://www.dataprivacyframework.gov/">EU-U.S. Data Privacy Framework</a>; and</li>
+      <li>Standard Contractual Clauses (SCCs) with both Google and Mixpanel as a backup.</li>
     </ul>
     <p>For Taiwan users, this transfer complies with the international transfer conditions recognized under PDPA Article 21.</p>
     <p>If you don't accept cross-border transfers, email us to opt out (see Your rights above).</p>
@@ -344,10 +373,11 @@
     <p>Personote is not designed for children under 13 and does not actively collect children's data. If you find we've accidentally received a child's data, email us and we'll delete it immediately.</p>
 
     <h2>Third parties we use</h2>
-    <p>Three only:</p>
+    <p>Four only:</p>
     <ul>
       <li><strong>Sign in with Apple</strong> — login; processed under <a href="https://www.apple.com/legal/privacy/">Apple's Privacy Policy</a></li>
-      <li><strong>iCloud (CloudKit)</strong> — syncing your data; same as above</li>
+      <li><strong>Google Sign-In</strong> — login; processed under <a href="https://policies.google.com/privacy">Google's Privacy Policy</a></li>
+      <li><strong>Firebase (Authentication + Firestore)</strong> — account auth and cloud sync; hosted on Google Cloud US servers; <a href="https://firebase.google.com/support/privacy">Firebase Privacy Policy</a></li>
       <li><strong>Mixpanel</strong> — pseudonymous usage stats; hosted on US servers; <a href="https://mixpanel.com/legal/privacy-policy/">Mixpanel Privacy Policy</a></li>
     </ul>
     <p>No Google Analytics, no Facebook SDK, no ad SDKs, and no third-party cookies (a native app doesn't use them).</p>
